@@ -1,0 +1,34 @@
+body,html{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+.float{
+    text-align: center;
+    position: absolute;
+    width: 564px;
+    right: 10px;
+    top: 10px;
+    min-height: 30px;
+    max-height: 588px;
+    z-index: 999;
+    background: white;
+    padding: 13px;
+    border-radius: 5px;
+    overflow: auto;
+}
+#mapid{
+    width: 100%;
+    height: 100%;
+}
+ul#cont{ margin-left: -20px}
+ul#cont li {
+    list-style: none;
+    list-style-position: outside;
+    color: #257eca;
+    text-align: left;
+    display: block;
+    padding: 3px 0px;
+    border-bottom: 1px solid #e4e4e4;
+    margin: 2px 0px;
+}
