@@ -6,6 +6,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 var arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider();
 
+
+
 var gisDay = L.esri.Geocoding.featureLayerProvider({
 	url: 'https://services.arcgis.com/uCXeTVveQzP4IIcx/arcgis/rest/services/GIS_Day_Final/FeatureServer/0',
 	searchFields: ['Country', 'State', 'City'], // Search these fields for text matches
@@ -28,6 +30,19 @@ var searchControl = L.esri.Geocoding.geosearch({
   ],
  // position:'topright'
 }).addTo(map);
+var centerLAt = null;
+searchControl.on("results", function(data) {
+	//console.log(data)
+
+	centerLAt = [data.latlng.lat, data.latlng.lng]
+
+	marker.setLatLng(centerLAt,{draggable:'true'}).bindPopup(''+centerLAt).update();
+
+		// results.clearLayers();
+		// for (var i = data.results.length - 1; i >= 0; i--) {
+		// 	results.addLayer(L.marker(data.results[i].latlng));
+		// }
+	})
 
 
 var drawnItems = new L.FeatureGroup();
@@ -78,13 +93,22 @@ for(let i = 0;i<noMarkers;i++){
     var lat = y_min + (Math.random() * (y_max - y_min));
     var lng = x_min + (Math.random() * (x_max - x_min));
 
-    var point  = turf.point([lng, lat]);
+    var point  = turf.point([lng, lat],{'lat':lat+','+lng},{draggable:'true'});
     var poly   = polygon.toGeoJSON();
     var inside = turf.inside(point, poly);
 
     if (inside) {
 		//return point
-		L.geoJson(point).addTo(layerone);
+		let marker = L.geoJson(point,{
+			onEachFeature:function(feature,layer){
+				console.log(layer)
+				layer.bindTooltip('Lat Lngs '+feature.properties.lat)	
+				layer.bindPopup('Lat Lngs <br>'+feature.properties.lat)	
+			}
+		})
+		marker.options.draggable =true;
+		console.log(marker.options)
+		marker.addTo(layerone);
 		//console.log([lng, lat])
 		LatLongs.push([cnt,lng,lat]);
 		$('#cont').append('<li><b>'+cnt+'</b> '+lat+'  '+lng+'</li>');
@@ -97,8 +121,10 @@ for(let i = 0;i<noMarkers;i++){
 	
 	
 }
-console.log(layerone._layers)
+//console.log(layerone._layers)
 	layerone.addTo(map)
+	
+	
 	//console.log(LatLongs)
 	$('.float').prepend('<button id=downloadExel>Download Exel</button>' )
 
@@ -142,8 +168,20 @@ let fileName = document.getElementById('name').value +'.csv'
 	x.click();
   }
 
+  marker = new L.marker([50.11904042481995,-117.49202710757628], {draggable:'true'}).bindPopup('Drag this marker to get lat longs');
+  marker.on('dragend', function(event){
+	  var marker = event.target;
+	  var position = marker.getLatLng();
+	  console.log(position);
+	  marker.setLatLng(position,{draggable:'true'}).bindPopup(''+position).update();
+	  marker.openPopup()
+	});
+	map.addLayer(marker);
+	
+	marker.openPopup()
 // get a geojson point from the function
 //var point = randomPointInPoly(polygon);
 
 // .. or add it to the map directly from the result
 //L.geoJson(randomPointInPoly(polygon)).addTo(map);
+//50.11904042481995,-117.49202710757628
